@@ -106,7 +106,18 @@ def supprimer_doublon(result_brut):
         elif flag ==1:
             pass
     return result_clean
-            
+
+#Je vous conseille d'écrire cette fonction comme ci-dessous, il marche plus vite
+#juste quelques secondes pour les données brutes du matin
+'''           
+def supprimer_doublon(result_list):
+    result = result_list
+    for i in range(1,len(result)):
+        for re in result[0:-i]:
+            if re[19:25] == result[-i][19:25] and re[40:48] == result[-i][40:48]:            
+                result.remove(re)
+    return result
+'''
         
         
 delta_HPM = Secondes("05:55:00")-Secondes(str(datetime.now())[11:19])+Secondes("24:00:00")
