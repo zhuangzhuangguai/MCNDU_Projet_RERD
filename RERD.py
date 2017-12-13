@@ -4,13 +4,15 @@ Created on Thu Nov 23 19:53:19 2017
 
 @author: sony
 """
-
+import codecs
+import csv
 import requests
 import pandas as pd
 import xml.etree.ElementTree as ET
 import time
 from time import sleep
 from datetime import datetime
+import multiprocessing
 
 import os
 New_rep = "C:/Users/sony/Desktop/RERD"
@@ -92,6 +94,21 @@ def extract_horaires_api(delta, list_gares_id, login_id, login_mdp):
     print ("Les données temps réel ont été enregistrées dans la liste avec succès")
     return result
 
+def supprimer_notD(result):
+    result_clean = []
+    for i in range(len(result)):
+        temp = result[i][26:30]
+        flag = 0
+        for j in range(len(list_mission)):
+            if temp == list_mission[j]:
+                flag = 1
+                break
+        if flag == 1:
+            result_clean.append(result[i])
+        elif flag == 0:
+            pass
+    return result_clean
+
 def supprimer_doublon(result_brut):
     result_clean = []
     result_clean.append(result_brut[0])
@@ -112,16 +129,67 @@ def supprimer_doublon(result_brut):
             pass
     return result_clean
 
+for i in range(0,len(ll)):
+    ll.append(23)
+    print(len(ll),i)
+    if 3*i >= len(ll):
+        break
+    
+
 #Je te conseille d'écrire cette fonction comme ci-dessous, il marche plus vite
 #juste quelques secondes pour les données brutes du matin
 '''           
-def supprimer_doublon(result_list):
-    result = result_list
+def supprimer_doublon(result):
     for i in range(1,len(result)):
         for re in result[0:-i]:
             if re[19:25] == result[-i][19:25] and re[40:48] == result[-i][40:48]:            
                 result.remove(re)
     return result
+
+def gp(result_list):
+    result = result_list
+    for i in range(len(result)):
+        for re in result[i+1::]:
+            if re[19:48] == result[i][19:48]:
+                result.remove(re)
+    return result
+
+simp = []   
+def gp(record):
+    simp.append(record)
+    for re in result[0::]:
+        #if re[19:48] == record[19:48]:
+        if re[:3] == record:
+            print(re)
+            result.remove(re)
+
+def getfirst(result):
+    result_d = {v: k for v, k in enumerate(result)}
+    leng = len(result_d)
+    for i in range(leng):
+        lengg = len(result_d)
+        for j in range(i+1,lengg,1):
+            if result_d[i]!='' and i<= lengg and result_d[j]!='' and result_d[j][19:48] == result[i][19:48]:
+                result_d[j] = ''
+    return result_d
+
+result_list_m=codecs.open('C:/Users/Liu Junqing/Desktop/20171203_result_m.txt',encoding='utf-8').read().split('\r\n')   
+
+f = codecs.open('C:/Users/Liu Junqing/Desktop/Listes_missions.csv', 'r')
+reader = csv.reader(f)
+mission = list(reader)
+
+del mission[0]
+list_mission = []
+for i in range(len(mission)):
+    list_mission.append(mission[i][0][:4])
+
+result = result_list_m
+re = supprimer_notD(result_list_m)
+test = getfirst(re)
+pool = multiprocessing.Pool(5)
+test = pool.map_async(gp,result)
+pool.map(print,[1,2,3])
 '''
     
 delta_HPM = Secondes("05:55:00")-Secondes(str(datetime.now())[11:19])+Secondes("24:00:00")
